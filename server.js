@@ -109,3 +109,4 @@ app.listen(PORT, () => {
 ///res (response) How the server talks back ie the message it sends on line 11
 //NEVER HARDCODE THE KEY
 //Inside content we are talking TO the AI model thats why its in plain english 
+//content is the only way to talk to the AI
