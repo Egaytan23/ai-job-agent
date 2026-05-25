@@ -32,13 +32,13 @@ app.post("/analyze", async (req, res) => {
         const completion = await openai.chat.completions.create({ //job description gets sent here, next ai generates a response, this is also where the pause is excuded 
             model: "gpt-4.1-mini",
             response_format: { type: "json_object" }, //tells the API that the response MUST be a JSON object
-           messages: [
+            messages: [
 
-    {
-        role: "system", //rules for the AI from line 38 to 59. line 43 is critical since it makes the output structed no intro text or markdown formatting
-//line 55 is making the ai forceably explain why score was given
-//content is us talking to the AI Model 
-       content: `
+                {
+                    role: "system", //rules for the AI from line 38 to 59. line 43 is critical since it makes the output structed no intro text or markdown formatting
+                    //line 55 is making the ai forceably explain why score was given
+                    //content is us talking to the AI Model 
+                    content: `
             Return ONLY a valid JSON object.
             
             Required format:
@@ -62,24 +62,27 @@ app.post("/analyze", async (req, res) => {
         - Output must start with {
         - Output must end with }
         `
-    },
+                },
 
-    {
-         role: "user",
-    content: `
+                {
+                    role: "user",
+                    content: `
     Analyze this job description and return the required JSON object.
 
     Job Description:
     ${jobDescription}
     `
-    }
+                }
 
-]
+            ]
         });
 
-        const aiResponse = JSON.parse(
-    completion.choices[0].message.content
-);
+        const aiResponse = JSON.parse( //JSON.parse makes the ai json txt into acutal javascript object
+            completion.choices[0].message.content
+        );
+        console.log(aiResponse);
+        console.log(aiResponse.matchScore);
+        console.log(aiResponse.recommendation);
 
         res.json({
             success: true,
@@ -108,5 +111,5 @@ app.listen(PORT, () => {
 //req (request) contains incoming data, URL info, headers, and body
 ///res (response) How the server talks back ie the message it sends on line 11
 //NEVER HARDCODE THE KEY
-//Inside content we are talking TO the AI model thats why its in plain english 
+//Inside content we are talking TO the AI model thats why its in plain english
 //content is the only way to talk to the AI
