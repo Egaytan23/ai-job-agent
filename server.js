@@ -16,6 +16,17 @@ const pool = new Pool({
     password: process.env.DB_PASSWORD,
     port: process.env.DB_PORT
 });
+
+//Test DB connection, When the server starts backend attempts DB connection, princes sucess or failure
+//Test early to make sure the app doesnt break GOOD PRACTICE 
+pool.connect() //pretty much asks PostgreSQL can my backend sucessfully connect to you
+    .then(() => {
+        console.log("Connected to PostgreSQL");
+    })
+    .catch((err) => {
+        console.log("Database connection error", err);
+    });
+
 app.use(express.json()); //this is used to the server can read incoming JSON w/o it cant read it properly, if JSON data comes then read it automatically
 
 const PORT = 3000;
@@ -92,7 +103,24 @@ app.post("/analyze", async (req, res) => {
         console.log(aiResponse);
         console.log(aiResponse.matchScore);
         console.log(aiResponse.recommendation);
+        
+        //Sends SQL into PostgreSQL
+        //Insert Into - adds a new row into this table 
+        await pool.query(
 
+            `INSERT INTO job_analyses 
+    (job_description, match_score, reasoning, recommendation)
+
+    VALUES ($1, $2, $3, $4)`,
+
+            [
+                jobDescription,
+                aiResponse.matchScore,
+                aiResponse.reasoning,
+                aiResponse.recommendation
+            ]
+
+        );
         res.json({
             success: true,
             analysis: aiResponse
@@ -122,3 +150,5 @@ app.listen(PORT, () => {
 //NEVER HARDCODE THE KEY
 //Inside content we are talking TO the AI model thats why its in plain english
 //content is the only way to talk to the AI
+//backend needs some way to send SQL queries/reveive results thats why we use pool line 23
+// pool = connection manager
