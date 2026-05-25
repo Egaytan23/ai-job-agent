@@ -1,12 +1,21 @@
+const { Pool } = require("pg"); //imports POSTGRESPQL
 const express = require("express"); //imports express so we can use it
 const OpenAI = require("openai"); //imports openai so we can use it
 require("dotenv").config(); //load variables from .env into the application
 const app = express(); //creates the backend application/ creates server application
+
 //creates a connection object to openai (think "this object knows how to talk to AI models")
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY //Go grab the API key from my environment variables NOT from the code
 });
-
+//creates a postgreSQL connection pool ie "my backend's connection to the database"
+const pool = new Pool({
+    user: process.env.DB_USER,
+    host: process.env.DB_HOST,
+    database: process.env.DB_NAME,
+    password: process.env.DB_PASSWORD,
+    port: process.env.DB_PORT
+});
 app.use(express.json()); //this is used to the server can read incoming JSON w/o it cant read it properly, if JSON data comes then read it automatically
 
 const PORT = 3000;
