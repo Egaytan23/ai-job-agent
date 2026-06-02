@@ -138,6 +138,47 @@ app.post("/analyze", async (req, res) => {
     }
 
 });
+//app.get(analyses) creates a new endpoint, backend listens for GET http://localhost:3000/analyses
+app.get("/analyses", async (req, res) => {
+    try{
+        const result = await pool.query( //send SQL to PostgreSQL (which is this below)
+            "SELECT * FROM job_analyses ORDER BY created_at DESC" //Select * = Get all columms, FROM job_analyses = get rows from this table, ORDER By created_at DESC = show newest analyses first
+        );
+        res.json({
+            success: true,
+            analyses: result.rows //contains all rows returned from PostgreSQL
+        });
+    } catch (error){
+        console.log(error);
+
+        res.status(500).json({
+            success: false,
+            error: "Failed to fetch analyses"
+        });
+    }
+});
+
+app.get("/analyses/:id", async (req, res) => { //listens for number after /analyses/
+    const id = req.params.id; //this line will become 1 or whatever number row we need which will give us that rows info
+//req.body = data sent inside the request and req.params = data sent through the URL
+    try{
+
+        const result = await pool.query(
+            "SELECT * FROM job_analyses WHERE id = $1", //give me ONLY the row whose id matches
+            [id] //place holder 
+        );
+        res.json({
+            success: true,
+            analyses: result.rows[0]
+        });
+    } catch (error){
+        console.log(error);
+        res.status(500).json({
+            success: false,
+            error: "Failed to fetch analysis"
+        });
+    }
+});
 
 // START SERVER
 app.listen(PORT, () => {
@@ -152,3 +193,4 @@ app.listen(PORT, () => {
 //content is the only way to talk to the AI
 //backend needs some way to send SQL queries/reveive results thats why we use pool line 23
 // pool = connection manager
+//when using pool.query() PostgreSQL returns a RESULT OBJECT inside it .rows contains acutal database rows 
