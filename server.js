@@ -180,6 +180,27 @@ app.get("/analyses/:id", async (req, res) => { //listens for number after /analy
     }
 });
 
+//this will let us delete rows based on ids
+app.delete("/analyses/:id", async (req, res) =>{
+    const id = req.params.id;
+    try{
+        await pool.query(
+            "DELETE FROM job_analyses WHERE id = $1", //Go into the job_analyses table and remove the row whose id matches similar to line 167
+            [id]
+        );
+        res.json({
+            success: true,
+            message: `Analysis ${id} deleted`
+        });
+    } catch (error) {
+        console.log(error);
+
+        res.status(500).json({
+            sucess: false,
+            error: "Failed to delete analysis"
+        });
+    }
+});
 // START SERVER
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
@@ -194,3 +215,4 @@ app.listen(PORT, () => {
 //backend needs some way to send SQL queries/reveive results thats why we use pool line 23
 // pool = connection manager
 //when using pool.query() PostgreSQL returns a RESULT OBJECT inside it .rows contains acutal database rows 
+//backticks ` insert a variable into a string
