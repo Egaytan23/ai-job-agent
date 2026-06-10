@@ -47,6 +47,13 @@ app.post("/analyze", async (req, res) => {
 
     const jobDescription = req.body.jobDescription; //Gets incoming job description
 
+    if (!jobDescription) {
+        return res.status(400).json({ //the 400 means bad request
+            sucess: false,
+            error: "Job description is required"
+        });
+    }
+
     try {
 
         const completion = await openai.chat.completions.create({ //job description gets sent here, next ai generates a response, this is also where the pause is excuded 
@@ -103,15 +110,17 @@ app.post("/analyze", async (req, res) => {
         console.log(aiResponse);
         console.log(aiResponse.matchScore);
         console.log(aiResponse.recommendation);
-        
+
         //Sends SQL into PostgreSQL
         //Insert Into - adds a new row into this table 
-        await pool.query(
+        const result = await pool.query(
 
-            `INSERT INTO job_analyses 
+            `INSERT INTO job_analyses
     (job_description, match_score, reasoning, recommendation)
 
-    VALUES ($1, $2, $3, $4)`,
+    VALUES ($1, $2, $3, $4)
+
+    RETURNING *`,
 
             [
                 jobDescription,
@@ -121,8 +130,11 @@ app.post("/analyze", async (req, res) => {
             ]
 
         );
+
+        //SELECT gets existing rows and RETURNING returns the row that was just inserted or updated
         res.json({
             success: true,
+            id: result.rows[0].id,
             analysis: aiResponse
         });
 
@@ -130,7 +142,7 @@ app.post("/analyze", async (req, res) => {
 
         console.log(error);
 
-        res.status(500).json({
+        res.status(500).json({ //the 500 means server error
             success: false,
             error: "AI request failed"
         });
@@ -140,7 +152,7 @@ app.post("/analyze", async (req, res) => {
 });
 //app.get(analyses) creates a new endpoint, backend listens for GET http://localhost:3000/analyses
 app.get("/analyses", async (req, res) => {
-    try{
+    try {
         const result = await pool.query( //send SQL to PostgreSQL (which is this below)
             "SELECT * FROM job_analyses ORDER BY created_at DESC" //Select * = Get all columms, FROM job_analyses = get rows from this table, ORDER By created_at DESC = show newest analyses first
         );
@@ -148,7 +160,7 @@ app.get("/analyses", async (req, res) => {
             success: true,
             analyses: result.rows //contains all rows returned from PostgreSQL
         });
-    } catch (error){
+    } catch (error) {
         console.log(error);
 
         res.status(500).json({
@@ -160,18 +172,24 @@ app.get("/analyses", async (req, res) => {
 
 app.get("/analyses/:id", async (req, res) => { //listens for number after /analyses/
     const id = req.params.id; //this line will become 1 or whatever number row we need which will give us that rows info
-//req.body = data sent inside the request and req.params = data sent through the URL
-    try{
+    //req.body = data sent inside the request and req.params = data sent through the URL
+    try {
 
         const result = await pool.query(
             "SELECT * FROM job_analyses WHERE id = $1", //give me ONLY the row whose id matches
             [id] //place holder 
         );
+        if (result.rows.length === 0) {
+            return res.status(404).json({
+                success: false,
+                error: "Analysis not found"
+            });
+        }
         res.json({
             success: true,
-            analyses: result.rows[0]
+            analysis: result.rows[0]
         });
-    } catch (error){
+    } catch (error) {
         console.log(error);
         res.status(500).json({
             success: false,
@@ -181,9 +199,9 @@ app.get("/analyses/:id", async (req, res) => { //listens for number after /analy
 });
 
 //this will let us delete rows based on ids
-app.delete("/analyses/:id", async (req, res) =>{
+app.delete("/analyses/:id", async (req, res) => {
     const id = req.params.id;
-    try{
+    try {
         await pool.query(
             "DELETE FROM job_analyses WHERE id = $1", //Go into the job_analyses table and remove the row whose id matches similar to line 167
             [id]
@@ -201,6 +219,38 @@ app.delete("/analyses/:id", async (req, res) =>{
         });
     }
 });
+
+app.put("/analyses/:id", async (req, res) => {
+    const id = req.params.id
+    const recommendation = req.body.recommendation
+
+    if (!recommendation) {
+        return res.status(400).json({
+            sucess: false,
+            error: "Recommendation is required"
+        });
+    }
+    try {
+        await pool.query( //update means modify an existing row
+            `UPDATE job_analyses 
+            SET recommendation = $1
+            WHERE id = $2`, //SET means change this column so here replace the recommendation value, WHERE mean which row
+            [recommendation, id]
+        );
+        res.json({
+            success: true,
+            message: `Analysis ${id} updated`
+        });
+    } catch (error) {
+        console.log(error);
+
+        res.status(500).json({
+            success: false,
+            error: "Failed to update analysis"
+        });
+    }
+});
+
 // START SERVER
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
@@ -214,5 +264,11 @@ app.listen(PORT, () => {
 //content is the only way to talk to the AI
 //backend needs some way to send SQL queries/reveive results thats why we use pool line 23
 // pool = connection manager
-//when using pool.query() PostgreSQL returns a RESULT OBJECT inside it .rows contains acutal database rows 
+//when using pool.query() PostgreSQL returns a RESULT OBJECT inside it .rows contains acutal database rows
 //backticks ` insert a variable into a string
+//GET = read
+//POST = create
+//PUT = update
+//DELETE = delete
+//PostgreSQL = actual database
+//pgadmin = tool used to look at PostgreSQL
