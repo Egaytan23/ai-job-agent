@@ -272,3 +272,8 @@ app.listen(PORT, () => {
 //DELETE = delete
 //PostgreSQL = actual database
 //pgadmin = tool used to look at PostgreSQL
+//for comments
+//JavaScript  -> //
+//.env        -> #
+//YAML        -> #
+//SQL         -> --

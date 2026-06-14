@@ -1,0 +1,20 @@
+services:
+  api:
+    build: .
+    ports:
+      - "3000:3000"
+      #this tells docker dont bake .env into the image but when the container starts load variable from it
+    env_file:
+      - .env
+#We built the API container image but for this image we used someone elses 
+  postgres:
+  #give me a container that has PostgreSQL 16 installed
+    image: postgres:16
+    #Telling the PostgreSQL container that these are the start up settings
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5432:5432"
+#Docker here is just DOWNLOADS this image ie the postgres service but creates a network link

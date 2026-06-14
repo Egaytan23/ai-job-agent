@@ -16,3 +16,4 @@ CMD ["node", "server.js"]
 #docker run -p 3000:3000 ai-job-agent
 #This pretty much is saying the api will run on port 3000 and 3000:3000 part means Host port : Container_port so it connects pc port to containers port
 #Basically this creates a bridge localhost:3000 -> Docker -> container port 3000 -> express now Postman can talk to the API
+#Docker must BUILD this image 
