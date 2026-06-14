@@ -3,6 +3,7 @@ const express = require("express"); //imports express so we can use it
 const OpenAI = require("openai"); //imports openai so we can use it
 require("dotenv").config(); //load variables from .env into the application
 const app = express(); //creates the backend application/ creates server application
+const cors = require("cors");
 
 //creates a connection object to openai (think "this object knows how to talk to AI models")
 const openai = new OpenAI({
@@ -26,7 +27,7 @@ pool.connect() //pretty much asks PostgreSQL can my backend sucessfully connect 
     .catch((err) => {
         console.log("Database connection error", err);
     });
-
+app.use(cors());
 app.use(express.json()); //this is used to the server can read incoming JSON w/o it cant read it properly, if JSON data comes then read it automatically
 
 const PORT = 3000;
@@ -277,3 +278,4 @@ app.listen(PORT, () => {
 //.env        -> #
 //YAML        -> #
 //SQL         -> --
+// npx create-vite@latest ai-job-agent-frontend --template react means to create a new react front end named ai_job-agent-frontend using react
