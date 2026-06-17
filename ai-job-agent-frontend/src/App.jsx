@@ -8,8 +8,10 @@ function App() {
   //state variables below
   const [jobDescription, setJobDescription] = useState("") //whatever the user typed setJobDescription = to the thing that updates it
   const [analysis, setAnalysis] = useState(null)
+  const [loading, setLoading] = useState(false)
 
   async function handleAnalyze() {
+    setLoading(true);
     const response = await fetch("http://localhost:3000/analyze", {
       method: "POST",
       headers: {
@@ -25,6 +27,7 @@ function App() {
     console.log(data);
 
     setAnalysis(data);
+    setLoading(false);
   }
   //everything in return gets drawn on the screen
   return (
@@ -43,6 +46,7 @@ function App() {
       <button onClick={handleAnalyze}>
         Analyze
       </button>
+      {loading && <p>Analyzing...</p>}
       {analysis && ( //mean if analysis exists show results else show nothing 
         <div>
           <h2>Results</h2>
@@ -61,8 +65,25 @@ function App() {
             <strong>Reasoning:</strong>{" "}
             {analysis.analysis.reasoning}
           </p>
+
+          <h3>Strengths</h3>
+
+          <ul>
+            {analysis.analysis.strengths.map((strength) => ( //map is basically a loop
+              <li>{strength}</li>
+            ))}
+          </ul>
+
+          <h3>Risks</h3>
+
+          <ul>
+            {analysis.analysis.risks.map((risk) => ( //map is basically a loop
+              <li>{risk}</li>
+            ))}
+          </ul>
         </div>
       )}
+
     </>
   )
 }
