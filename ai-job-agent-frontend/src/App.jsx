@@ -9,6 +9,7 @@ function App() {
   const [jobDescription, setJobDescription] = useState("") //whatever the user typed setJobDescription = to the thing that updates it
   const [analysis, setAnalysis] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [history, setHistory] = useState([])
 
   async function handleAnalyze() {
     setLoading(true);
@@ -22,6 +23,14 @@ function App() {
       })
     });
 
+    async function fetchHistory() {
+      const response = await fetch("http://localhost:3000/analyses");
+      const data = await response.json();
+
+      console.log(data);
+
+      setHistory(data.analyses);
+    }
     const data = await response.json();
 
     console.log(data);
@@ -45,6 +54,9 @@ function App() {
       <p>{jobDescription}</p>
       <button onClick={handleAnalyze}>
         Analyze
+      </button>
+      <button onClick={fetchHistory}>
+        Load History
       </button>
       {loading && <p>Analyzing...</p>}
       {analysis && ( //mean if analysis exists show results else show nothing 
