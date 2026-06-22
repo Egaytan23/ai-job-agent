@@ -13,6 +13,7 @@ function App() {
 
   async function handleAnalyze() {
     setLoading(true);
+
     const response = await fetch("http://localhost:3000/analyze", {
       method: "POST",
       headers: {
@@ -23,14 +24,6 @@ function App() {
       })
     });
 
-    async function fetchHistory() {
-      const response = await fetch("http://localhost:3000/analyses");
-      const data = await response.json();
-
-      console.log(data);
-
-      setHistory(data.analyses);
-    }
     const data = await response.json();
 
     console.log(data);
@@ -38,6 +31,24 @@ function App() {
     setAnalysis(data);
     setLoading(false);
   }
+
+  async function fetchHistory() {
+    const response = await fetch("http://localhost:3000/analyses");
+    const data = await response.json();
+
+    console.log(data);
+
+    setHistory(data.analyses);
+  }
+
+  async function deleteAnalysis(id) {
+    await fetch(`http://localhost:3000/analyses/${id}`, {
+      method: "DELETE"
+    });
+
+    fetchHistory();
+  }
+
   //everything in return gets drawn on the screen
   return (
     <>
@@ -52,12 +63,43 @@ function App() {
         onChange={(event) => setJobDescription(event.target.value)} //everytime the user types, update jobDescription
       ></textarea>
       <p>{jobDescription}</p>
-      <button onClick={handleAnalyze}>
-        Analyze
+      <button
+        onClick={handleAnalyze}
+        disabled={loading}
+      > 
+        {loading ? "Analyzing..." : "Analyze"} 
       </button>
       <button onClick={fetchHistory}>
         Load History
       </button>
+      {history.length > 0 && (
+        <>
+          <h2>History</h2>
+
+          {history.map((item) => (
+            <div key={item.id}>
+              <h3>Analysis #{item.id}</h3>
+
+              <p>
+                <strong>Score:</strong> {item.match_score}
+              </p>
+
+              <p>
+                <strong>Recommendation:</strong> {item.recommendation}
+              </p>
+
+              <p>
+                <strong>Reasoning:</strong> {item.reasoning}
+              </p>
+              <button onClick={() => deleteAnalysis(item.id)}>
+                Delete
+              </button>
+              <hr />
+            </div>
+          ))}
+        </>
+      )}
+
       {loading && <p>Analyzing...</p>}
       {analysis && ( //mean if analysis exists show results else show nothing 
         <div>
@@ -101,3 +143,7 @@ function App() {
 }
 
 export default App
+
+//cd ai-job-agent-frontend
+//npm run dev 
+//line 70 is a ternary operator 
