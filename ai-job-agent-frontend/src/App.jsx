@@ -48,10 +48,14 @@ function App() {
 
     fetchHistory();
   }
-
+  function getRecommendationColor(recommendation) {
+    if (recommendation === "APPLY") return "green";
+    if (recommendation === "CONSIDER") return "orange";
+    return "red";
+  }
   //everything in return gets drawn on the screen
   return (
-    <>
+    <div className="container">
 
       <h2>AI Job Agent</h2>
 
@@ -66,8 +70,8 @@ function App() {
       <button
         onClick={handleAnalyze}
         disabled={loading}
-      > 
-        {loading ? "Analyzing..." : "Analyze"} 
+      >
+        {loading ? "Analyzing..." : "Analyze"}
       </button>
       <button onClick={fetchHistory}>
         Load History
@@ -77,7 +81,7 @@ function App() {
           <h2>History</h2>
 
           {history.map((item) => (
-            <div key={item.id}>
+            <div key={item.id} className="history-card">
               <h3>Analysis #{item.id}</h3>
 
               <p>
@@ -102,7 +106,7 @@ function App() {
 
       {loading && <p>Analyzing...</p>}
       {analysis && ( //mean if analysis exists show results else show nothing 
-        <div>
+        <div className="results-card">
           <h2>Results</h2>
 
           <p>
@@ -111,8 +115,17 @@ function App() {
           </p>
 
           <p>
-            <strong>Recommendation:</strong>{" "}
-            {analysis.analysis.recommendation}
+            <strong>Recommendation:</strong>
+
+            <span
+              style={{
+                color: getRecommendationColor(
+                  analysis.analysis.recommendation
+                )
+              }}
+            >
+              {analysis.analysis.recommendation}
+            </span>
           </p>
 
           <p>
@@ -138,7 +151,7 @@ function App() {
         </div>
       )}
 
-    </>
+    </div>
   )
 }
 
