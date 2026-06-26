@@ -78,7 +78,6 @@ app.post("/analyze", async (req, res) => {
         "strengths": ["string"],
         "risks": ["string"],
         "recommendation": "APPLY | CONSIDER | SKIP"
-        "Good bye": ["string"],
         }
 
         Rules:
