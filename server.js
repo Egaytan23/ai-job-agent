@@ -18,9 +18,9 @@ const pool = new Pool({
     port: process.env.DB_PORT
 });
 
-//Test DB connection, When the server starts backend attempts DB connection, princes sucess or failure
+//Test DB connection, When the server starts backend attempts DB connection, princes success or failure
 //Test early to make sure the app doesnt break GOOD PRACTICE 
-pool.connect() //pretty much asks PostgreSQL can my backend sucessfully connect to you
+pool.connect() //pretty much asks PostgreSQL can my backend successfully connect to you
     .then(() => {
         console.log("Connected to PostgreSQL");
     })
@@ -30,7 +30,7 @@ pool.connect() //pretty much asks PostgreSQL can my backend sucessfully connect 
 app.use(cors());
 app.use(express.json()); //this is used to the server can read incoming JSON w/o it cant read it properly, if JSON data comes then read it automatically
 
-const PORT = 3000;
+const PORT = process.env.port || 3000; //this mean If Render gives me a PORT use it other wise use 3000
 
 
 // TEST ROUTE
@@ -50,7 +50,7 @@ app.post("/analyze", async (req, res) => {
 
     if (!jobDescription) {
         return res.status(400).json({ //the 400 means bad request
-            sucess: false,
+            success: false,
             error: "Job description is required"
         });
     }
@@ -215,7 +215,7 @@ app.delete("/analyses/:id", async (req, res) => {
         console.log(error);
 
         res.status(500).json({
-            sucess: false,
+            success: false,
             error: "Failed to delete analysis"
         });
     }
@@ -227,7 +227,7 @@ app.put("/analyses/:id", async (req, res) => {
 
     if (!recommendation) {
         return res.status(400).json({
-            sucess: false,
+            success: false,
             error: "Recommendation is required"
         });
     }
