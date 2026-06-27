@@ -15,7 +15,10 @@ const pool = new Pool({
     host: process.env.DB_HOST,
     database: process.env.DB_NAME,
     password: process.env.DB_PASSWORD,
-    port: process.env.DB_PORT
+    port: process.env.DB_PORT,
+    ssl: { //add ssl bc its required for render we were having issues with the password 
+        rejectUnauthorized: false
+    }
 });
 
 //Test DB connection, When the server starts backend attempts DB connection, princes success or failure
