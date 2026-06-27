@@ -14,7 +14,7 @@ function App() {
   async function handleAnalyze() {
     setLoading(true);
 
-    const response = await fetch("http://localhost:3000/analyze", {
+    const response = await fetch("https://ai-job-agent-lbgs.onrender.com/analyze", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -33,7 +33,7 @@ function App() {
   }
 
   async function fetchHistory() {
-    const response = await fetch("http://localhost:3000/analyses");
+    const response = await fetch("https://ai-job-agent-lbgs.onrender.com/analyses");
     const data = await response.json();
 
     console.log(data);
@@ -42,7 +42,7 @@ function App() {
   }
 
   async function deleteAnalysis(id) {
-    await fetch(`http://localhost:3000/analyses/${id}`, {
+    await fetch(`https://ai-job-agent-lbgs.onrender.com/analyses/${id}`, {
       method: "DELETE"
     });
 
