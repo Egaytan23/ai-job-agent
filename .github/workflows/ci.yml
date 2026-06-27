@@ -1,0 +1,30 @@
+name: CI Pipeline #this is just the name that Git sees
+
+on: #WHEN should Github do this
+  push: # line 3
+    branches:
+      - main #only do this when code reaches the main branch
+
+jobs: # pretty much a task Github must preform
+  build-frontend: #jobs name
+    runs-on: ubuntu-latest #builds a new linux computer every push
+
+    defaults: 
+      run:
+        working-directory: ai-job-agent-frontend #walk into this folder to build the front end 
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build React application
+        run: npm run build
+#linux computer deletes forever after test, it does this so everyone builds on the exact same enviornment 
