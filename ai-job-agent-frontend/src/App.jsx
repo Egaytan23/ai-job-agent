@@ -3,7 +3,7 @@ import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import heroImg from './assets/hero.png'
 import './App.css'
-
+const = 
 function App() {
   //state variables below
   const [jobDescription, setJobDescription] = useState("") //whatever the user typed setJobDescription = to the thing that updates it
