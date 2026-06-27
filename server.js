@@ -9,18 +9,9 @@ const cors = require("cors");
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY //Go grab the API key from my environment variables NOT from the code
 });
-console.log("DB_USER:", process.env.DB_USER);
-console.log("DB_HOST:", process.env.DB_HOST);
-console.log("DB_NAME:", process.env.DB_NAME);
-console.log("DB_PORT:", process.env.DB_PORT);
-//creates a postgreSQL connection pool ie "my backend's connection to the database"
 const pool = new Pool({
-    user: process.env.DB_USER,
-    host: process.env.DB_HOST,
-    database: process.env.DB_NAME,
-    password: process.env.DB_PASSWORD,
-    port: process.env.DB_PORT,
-    ssl: { //add ssl bc its required for render we were having issues with the password 
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
         rejectUnauthorized: false
     }
 });
